@@ -51,7 +51,7 @@ Log.Php = function (data, formatter)
 	return log.parse (formatter);
 };
 
-Log.Iterator = function (data, keysOnly = false)
+Log.Iterator = function (data, keysOnly)
 {
 	var pos = 0, length = data.length;
 	

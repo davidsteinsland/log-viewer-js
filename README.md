@@ -54,3 +54,28 @@ php = Log.Php(php, new Log.Formatter({
 	}
 }));
 ```
+
+## Custom logs
+```javascript
+// New messages begins with: "->"
+var custom = [
+	"->Hello, World",
+	"What are you doing? This is a multiline message!",
+	"->New message here"
+];
+
+var parsed = new Log.Parser (custom, {
+	newLine: function (line)
+	{
+		return /^->/.test(line);
+	}
+}).parse(new Log.Formatter ({
+	onLine: function (msg)
+	{
+		// format each within <li>s
+		return '<li>' + msg + '</li>';
+	}
+}));
+
+$('ul#list').html(parsed);
+```
