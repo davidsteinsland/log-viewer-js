@@ -69,7 +69,7 @@ Log.Iterator = function (data, keysOnly)
 		{
 			if ( ! this.hasNext() )
 				throw "Stop iterating"
-			return data[pos] + 1;
+			return data[pos];
 		},
 		next: function ()
 		{
