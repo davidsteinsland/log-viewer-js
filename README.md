@@ -32,7 +32,7 @@ php = [
 ];
 
 var formatter = new Log.Formatter ({
-	onLine: function (line)
+	messageFormat: function (line)
 	{
 		// a basic HTML formatter
 		return '<li>' + line + '</li>';
@@ -48,7 +48,7 @@ formatter.ifMatch (function (line)
 
 var apache = Log.Apache(httpd, formatter),
 php = Log.Php(php, new Log.Formatter({
-	onLine: function (line)
+	messageFormat: function (line)
 	{
 		return '<li>' + line.replace (/[\n]+/g, "<br />") + '</li>';
 	}
@@ -65,12 +65,12 @@ var custom = [
 ];
 
 var parsed = new Log.Parser (custom, {
-	newLine: function (line)
+	newMessage: function (line)
 	{
 		return /^->/.test(line);
 	}
 }).parse(new Log.Formatter ({
-	onLine: function (msg)
+	messageFormat: function (msg)
 	{
 		// format each within <li>s
 		return '<li>' + msg + '</li>';
