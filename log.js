@@ -31,7 +31,7 @@ var Log = {};
 Log.Apache = function (data, formatter)
 {
 	var log = new Log.Parser (data, {
-		newLine: function (line)
+		newMessage: function (line)
 		{
 			return /^\[(?:\w{3} ){2}\d{2} (?:\d{2}:){2}\d{2} \d{4}\]/.test(line);
 		}
@@ -42,7 +42,7 @@ Log.Apache = function (data, formatter)
 Log.Php = function (data, formatter)
 {
 	var log = new Log.Parser (data, {
-		newLine: function (line)
+		newMessage: function (line)
 		{
 			return /^\[\d{2}-[a-zA-Z]{3}-\d{4} \d{2}:\d{2}:\d{2}(?: [A-Za-z\/]+)*\]/.test(line);
 		}
@@ -54,6 +54,7 @@ Log.Php = function (data, formatter)
 Log.Iterator = function (data, keysOnly)
 {
 	var pos = 0, length = data.length;
+	keysOnly = keysOnly || false;
 	
 	return {
 		current: function ()
@@ -64,11 +65,11 @@ Log.Iterator = function (data, keysOnly)
 		{
 			return length > pos;
 		},
-		peek: function (pos)
+		peek: function ()
 		{
-			if ( pos < 0 || pos >= length)
-				throw "Invalid position";
-			return data[pos];
+			if ( ! this.hasNext() )
+				throw "Stop iterating"
+			return data[pos] + 1;
 		},
 		next: function ()
 		{
@@ -97,11 +98,11 @@ Log.Parser = function (data, options)
 		 * Whether or not the current line is a new message in the log, or if it is just a continuing of
 		 * the previous message.
 		 * 
-		 * @return bool if the line is a new message or not. Default: false
+		 * @return bool if the line is a new message or not. Default: true; every new line is treated as a new message
 		 */
-		newLine: function (line)
+		newMessage: function (line)
 		{
-			return false;
+			return true;
 		},
 	}, options || {});
 	
@@ -115,7 +116,7 @@ Log.Parser = function (data, options)
 				while ( (line = $this.iterator.next()) )
 				{
 					// group all error messages that might run for more than 1 line
-					while ( $this.iterator.hasNext() && ! $this.options.newLine ($this.iterator.peek(line[0] + 1)) )
+					while ( $this.iterator.hasNext() && ! $this.options.newMessage ($this.iterator.peek()) )
 					{
 						line[1] += "\n" + $this.iterator.next()[1];
 					}
@@ -138,7 +139,7 @@ Log.Parser = function (data, options)
 Log.Formatter = function (options)
 {
 	options = extend ({
-		onLine: function (line)
+		messageFormat: function (line)
 		{
 			return line + "\n";
 		},
@@ -167,7 +168,7 @@ Log.Formatter = function (options)
 						line = cond(line);
 				}
 				
-				result += options.onLine (line);
+				result += options.messageFormat (line);
 			}
 			
 			return result;

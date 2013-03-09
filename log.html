@@ -33,7 +33,7 @@
 		};
 		
 		var formatter = new Log.Formatter ({
-				onLine: function (line)
+				messageFormat: function (line)
 				{
 					// a basic HTML formatter
 					return '<li>' + line + '</li>';
@@ -47,10 +47,15 @@
 			return '<em>' + line + '</em>';
 		});
 		
-		var plain = new Log.Parser (dataSet.plain).parse(),
+		var plain = new Log.Parser (dataSet.plain).parse(new Log.Formatter ({
+			messageFormat: function (line)
+			{
+				return "+ " + line + "\n";
+			}
+		})),
 			apache = Log.Apache(dataSet.httpd, formatter),
 			php = Log.Php(dataSet.php, new Log.Formatter({
-				onLine: function (line)
+				messageFormat: function (line)
 				{
 					return '<li>' + line.replace (/[\n]+/g, "<br />") + '</li>';
 				}
